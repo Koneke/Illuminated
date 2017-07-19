@@ -46,6 +46,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="Misc\Curves.cs" />
     <Compile Include="Misc\Vector2Extensions.cs" />
     <Compile Include="Model\Model.cs" />
     <Compile Include="Model\Model.IllLocalPlayer.cs" />

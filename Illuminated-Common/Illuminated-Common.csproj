@@ -51,6 +51,7 @@
     <Compile Include="Net\Message\Message.Create.cs" />
     <Compile Include="Net\Message\Message.cs" />
     <Compile Include="Net\Message\Message.Types.cs" />
+    <Compile Include="Net\Messenger.cs" />
     <Compile Include="Net\NetValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

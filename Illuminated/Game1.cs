@@ -1,17 +1,13 @@
-﻿using System;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Forms = System.Windows.Forms;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-using Illuminated.Common;
-
 namespace Illuminated.Client
 {
-	public class Game1 : Game, IConnected
+	public class Game1 : Game
 	{
 		private GraphicsDeviceManager graphics;
 		private SpriteBatch spriteBatch;
@@ -51,9 +47,11 @@ namespace Illuminated.Client
 			debugFont = Content.Load<SpriteFont>("Fonts/Debug");
 		}
 
-		private void Quit(object sender = null, System.ComponentModel.CancelEventArgs e = null)
+		private void Quit(
+			object sender = null,
+			System.ComponentModel.CancelEventArgs e = null)
 		{
-			this.Disconnect();
+			this.client.Dispose();
 			this.Exit();
 		}
 
@@ -84,6 +82,12 @@ namespace Illuminated.Client
 
 			this.client.Receive();
 
+			foreach (var player in this.model.Players)
+			{
+				player.Curves.Tick(
+					gameTime.ElapsedGameTime.Milliseconds);
+			}
+
 			base.Update(gameTime);
 		}
 
@@ -107,28 +111,28 @@ namespace Illuminated.Client
 
 			foreach (var player in this.model.Players)
 			{
+				var position =
+					(player.Position + player.Curves.Current)
+					.Round();
+
 				spriteBatch.Draw(
 					this.temp,
-					player.Position.Round(),
+					position,
 					player == this.model.Player
 						? Color.Red
 						: Color.White);
 
-				this.DrawShadowedString(
-					this.debugFont,
-					$"{player.Position.Round().X}, {player.Position.Round().Y}",
-					player.Position.Round(),
-					Color.White);
+				if (false)
+					this.DrawShadowedString(
+						this.debugFont,
+						$"{position.X}, {position.Y}",
+						player.Position.Round(),
+						Color.White);
 			}
 
 			spriteBatch.End();
 
 			base.Draw(gameTime);
-		}
-
-		public void Disconnect()
-		{
-			this.client.Disconnect();
 		}
 	}
 }

@@ -48,11 +48,12 @@ namespace Illuminated.Net
 				foreach (var inherited in this.inheritedMessages)
 				{
 					T field;
+
 					try
 					{
 						field = inherited.GetField<T>(fieldName);
 					}
-					catch (Exception e)
+					catch (Exception)
 					{
 						continue;
 					}

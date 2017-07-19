@@ -24,7 +24,6 @@ namespace Illuminated.Client
 			{
 				this.UncommittedMovement = this.UncommittedMovement - committedDelta;
 				this.SetPosition(base.Position + committedDelta);
-				// this.UncommittedMovement = Vector2.Zero;
 			}
 		}
 	}

@@ -12,6 +12,8 @@ namespace Illuminated.Client
 
 			public virtual Vector2 Position { get; private set; }
 
+			public CurveSystem Curves = new CurveSystem();
+
 			public IllPlayer(int id)
 			{
 				this.ID = id;

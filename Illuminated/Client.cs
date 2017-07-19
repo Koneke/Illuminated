@@ -11,7 +11,7 @@ namespace Illuminated.Client
 		void Disconnect();
 	}
 
-	public class IllClient : IConnected
+	public class IllClient : IDisposable
 	{
 		private Model model;
 		private NetClient client;
@@ -33,7 +33,7 @@ namespace Illuminated.Client
 		{
 			var ds = this.model.Player.UncommittedMovement.Round();
 
-			this.SendMessage(Net.Message.Create(Net.Message.Types.Run)
+			this.SendMessage(Net.Message.Create(Net.Message.MessageType.Run)
 				.SetField("dx", ds.X)
 				.SetField("dy", ds.Y));
 
@@ -81,8 +81,13 @@ namespace Illuminated.Client
 				switch (incoming.MessageType)
 				{
 					case NetIncomingMessageType.Data:
+						
+						var messageType = (Net.Message.MessageType) Enum.Parse(
+							typeof(Net.Message.MessageType),
+							incoming.ReadString());
+
 						var message = Net.Message
-							.Create(incoming.ReadString())
+							.Create(messageType)
 							.Read(incoming);
 
 						switch (message.Type)
@@ -114,9 +119,18 @@ namespace Illuminated.Client
 								var player = this.model.PlayerByID(
 									message.GetField<int>("player-id"));
 
-								player.SetPosition(new Vector2(
+								var pre = player.Position;
+
+								var post = new Vector2(
 									message.GetField<float>("x"),
-									message.GetField<float>("y")));
+									message.GetField<float>("y"));
+
+								var ds = post - pre;
+
+								player.SetPosition(post);
+								player.Curves.Add(new LinearCurve(
+									-ds,
+									(int)(50 * 1.1f)));
 								break;
 						}
 						break;
@@ -135,7 +149,7 @@ namespace Illuminated.Client
 			}
 		}
 
-		public void Disconnect()
+		public void Dispose()
 		{
 			this?.commitMovement?.Deschedule();
 			this.client.Disconnect("Leaving.");

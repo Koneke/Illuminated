@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Illuminated
@@ -16,6 +17,9 @@ namespace Illuminated
 		{
 			return Convert.ChangeType(o, t);
 		}
+
+		public static List<T> Exclude<T>(this List<T> l, T except) =>
+			l.Except(new [] { except }).ToList();
 	}
 
 	public class TypeSwitch

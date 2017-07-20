@@ -52,7 +52,10 @@ namespace Illuminated.Net
 					.SetField("x", client.Player.Position.X)
 					.SetField("y", client.Player.Position.Y));
 
-			this.CatchUp(client);
+			if (this.Clients.All.Count > 1)
+			{
+				this.CatchUp(client);
+			}
 
 			return client;
 		}

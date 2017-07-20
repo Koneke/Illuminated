@@ -6,6 +6,9 @@ namespace Illuminated.Net
 {
 	public class ClientCollection
 	{
+		public Client this[NetConnection c] => this.ByConnection[c];
+		public Client this[int i] => this.ByID[i];
+
 		public List<Client> All;
 		public Dictionary<NetConnection, Client> ByConnection;
 		public Dictionary<int, Client> ByID;

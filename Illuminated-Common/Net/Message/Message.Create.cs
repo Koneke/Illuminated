@@ -42,6 +42,12 @@ namespace Illuminated.Net
 					return new Message(MessageType.PlayerPosition)
 						.AddField<int>("player-id")
 						.AddInherited(Create(MessageType.Vector));
+
+				// security
+				case MessageType.SafeHandshake:
+					return new Message(MessageType.SafeHandshake)
+						.AddField<string>("guid")
+						.AddField<string>("salt");
 			}
 
 			return null;
@@ -52,10 +58,33 @@ namespace Illuminated.Net
 			// from client
 			switch (type)
 			{
+				case MessageType.Login:
+					return new Net.Message(MessageType.Login)
+						.AddField<string>("username")
+						.AddField<byte[]>("password");
+
 				case MessageType.Run:
 					return new Net.Message(MessageType.Run)
 						.AddField<float>("dx")
 						.AddField<float>("dy");
+
+				// security
+				case MessageType.RequestSafeConversation:
+					return new Net.Message(MessageType.RequestSafeConversation);
+			}
+
+			return null;
+		}
+
+		private static Message createBoth(MessageType type)
+		{
+			// from both
+			switch (type)
+			{
+				case MessageType.SafeHandshake:
+					return new Net.Message(MessageType.SafeMessage)
+						.AddField<string>("guid")
+						.AddField<string>("data");
 			}
 
 			return null;
@@ -65,6 +94,7 @@ namespace Illuminated.Net
 			createGeneric(type) ??
 			createServerMessage(type) ??
 			createClientMessage(type) ??
+			createBoth(type) ??
 			throw new Exception($"Unknown message type {type}.");
 	}
 }

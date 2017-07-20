@@ -27,5 +27,8 @@ namespace Illuminated.Net
 			this.Defined = true;
 			this.Value = o;
 		}
+
+		public override string ToString() =>
+			this.Value.ToString();
 	}
 }

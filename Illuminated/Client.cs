@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 
@@ -18,6 +19,9 @@ namespace Illuminated.Client
 
 		private Common.Async.PeriodicalTask commitMovement;
 
+		public List<Net.Message.MessageType> History =
+			new List<Net.Message.MessageType>();
+
 		public IllClient(Model model)
 		{
 			this.model = model;
@@ -32,6 +36,12 @@ namespace Illuminated.Client
 		private void CommitLocalPlayerMovement()
 		{
 			var ds = this.model.Player.UncommittedMovement.Round();
+
+			// too insignificant movement, disregard
+			if (ds.Length() < 5f)
+			{
+				return;
+			}
 
 			this.SendMessage(Net.Message.Create(Net.Message.MessageType.Run)
 				.SetField("dx", ds.X)
@@ -85,6 +95,10 @@ namespace Illuminated.Client
 						var messageType = (Net.Message.MessageType) Enum.Parse(
 							typeof(Net.Message.MessageType),
 							incoming.ReadString());
+
+						// pos is too spammy for debug info
+						if (messageType != Net.Message.MessageType.PlayerPosition)
+							this.History.Add(messageType);
 
 						var message = Net.Message
 							.Create(messageType)

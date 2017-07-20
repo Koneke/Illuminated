@@ -1,21 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Lidgren.Network;
 
 namespace Illuminated.Net
 {
+	public class SenderInfo
+	{
+		public NetConnection Connection;
+	}
+
 	public partial class Message
 	{
 		public MessageType Type;
+		public bool IsSecure;
 		public Dictionary<string, NetValue> Fields;
 
 		private List<string> keys;
 		private List<Message> inheritedMessages;
 
+		public SenderInfo SenderInfo;
+
 		public Message(MessageType type)
 		{
 			this.Type = type;
+			this.IsSecure = false;
 			this.Fields = new Dictionary<string, NetValue>();
 			this.keys = new List<string>();
 			this.inheritedMessages = new List<Message>();
@@ -111,6 +121,10 @@ namespace Illuminated.Net
 			// why in the name of actual fuck do I need to reset the
 			// position of an incoming message stream manually.....?
 			//message.Position = 0;
+			this.SenderInfo = new SenderInfo
+			{
+				Connection = message.SenderConnection
+			};
 
 			foreach (var key in this.keys)
 			{
@@ -118,7 +132,9 @@ namespace Illuminated.Net
 
 				var ts = new TypeSwitch()
 					.Case((int x) => this.SetField(key, message.ReadInt32()))
-					.Case((float x) => this.SetField(key, message.ReadSingle()));
+					.Case((float x) => this.SetField(key, message.ReadSingle()))
+					.Case((byte x) => this.SetField(key, message.ReadByte()))
+					.Case((string x) => this.SetField(key, message.ReadString()));
 
 				ts.Switch(nv.Type);
 			}
@@ -144,7 +160,9 @@ namespace Illuminated.Net
 
 				var ts = new TypeSwitch()
 					.Case((int x) => message.Write(x))
-					.Case((float x) => message.Write(x));
+					.Case((float x) => message.Write(x))
+					.Case((byte x) => message.Write(x))
+					.Case((string x) => message.Write(x));
 
 				ts.Switch(nv.Value);
 			}
@@ -155,6 +173,37 @@ namespace Illuminated.Net
 			}
 
 			return this;
+		}
+
+		public Message Secure(bool status = true)
+		{
+			this.IsSecure = status;
+
+			return this;
+		}
+
+		private IEnumerable<(string k, NetValue v)> GetFields()
+		{
+			var fs = new List<(string k, NetValue v)>(this.Fields.Keys
+				.Zip(this.Fields.Values, (k, v) => (k: k, v: v)));
+
+			foreach (var im in this.inheritedMessages)
+			{
+				fs.AddRange(im.GetFields());
+			}
+
+			return fs;
+		}
+
+		public override string ToString()
+		{
+			return
+				$"{this.Type} " + "{ " +
+				string.Join(
+					", ",
+					this.GetFields()
+						.Select((kv) => $"{kv.k}:{kv.v.ToString()}")) +
+				" }";
 		}
 	}
 }

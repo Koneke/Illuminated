@@ -1,4 +1,7 @@
 ﻿using System.Linq;
+
+using Lidgren.Network;
+
 using Microsoft.Xna.Framework;
 
 namespace Illuminated.Net
@@ -7,19 +10,22 @@ namespace Illuminated.Net
 	{
 		private class DataMessageHandler
 		{
-			public MessageQueue MessageQueue;
+			public MessageQueue MessageQueue =
+				new MessageQueue();
 
 			private Model model;
 
 			public DataMessageHandler(Model model)
 			{
 				this.model = model;
-				this.MessageQueue = new MessageQueue();
 			}
 
-			public void HandleData(MessageHandler.ReceivedMessage received)
+			public void HandleData(NetIncomingMessage incoming)
 			{
-				var client = received.Client;
+				var mt = MessageHandler.ReadType(incoming);
+				var received = MessageHandler.ReceivedMessage.Receive(mt, incoming);
+
+				var client = this.model.Clients[received.Connection];
 				var message = received.Message;
 
 				switch (received.MessageType)

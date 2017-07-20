@@ -2,29 +2,44 @@ namespace Illuminated.Net
 {
 	public partial class Message
 	{
-		public class Types
-		{
-			// generic
-			public const string Vector = "Vector";
-
-			// from server
-			public const string Spawn = "Spawn";
-			public const string OtherSpawn = "OtherSpawn";
-			public const string OtherDisconnected = "OtherDisconnected";
-			public const string PlayerPosition = "PlayerPosition";
-
-			// from client
-			public const string Run = "Run";
-		}
-
 		public enum MessageType
 		{
+			// generic
 			Vector,
+
+			// from server
 			Spawn,
 			OtherSpawn,
 			OtherDisconnected,
 			PlayerPosition,
-			Run
+
+				// security
+				SafeHandshake,
+
+			// from client
+			Login,
+			Run,
+
+				// security
+				RequestSafeConversation,
+			
+			// from both
+				// security
+				SafeMessage,
+
+			// special
+			Terminal,
 		}
+
+		public static readonly MessageType[] SecureTypes = {
+			// from server
+			MessageType.SafeHandshake,
+
+			// from client
+			MessageType.RequestSafeConversation,
+
+			// from both
+			MessageType.SafeMessage
+		};
 	}
 }

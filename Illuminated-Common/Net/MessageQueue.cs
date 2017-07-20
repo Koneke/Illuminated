@@ -35,7 +35,10 @@ namespace Illuminated.Net
 			List<MessageRecipient> recipients,
 			Message message
 		) {
-			recipients.Exclude(excluded).Select(r => this.SendSingle(r, message));
+			foreach(var r in recipients.Exclude(excluded))
+			{
+				this.SendSingle(r, message);
+			}
 
 			return this;
 		}
@@ -45,7 +48,10 @@ namespace Illuminated.Net
 			IEnumerable<MessageRecipient> recipients,
 			Message message
 		) {
-			recipients.Exclude(excluded).Select(r => this.SendSingle(r, message));
+			foreach(var r in recipients.Exclude(excluded))
+			{
+				this.SendSingle(r, message);
+			}
 
 			return this;
 		}

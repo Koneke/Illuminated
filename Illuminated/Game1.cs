@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+
 using Forms = System.Windows.Forms;
 
 using Microsoft.Xna.Framework;
@@ -19,6 +21,8 @@ namespace Illuminated.Client
 		private IllClient client;
 
 		private Input input;
+
+		private string[] msgLog = new string[5];
 
 		public Game1()
 		{
@@ -80,6 +84,14 @@ namespace Illuminated.Client
 				}
 			}
 
+			if (this.input.Pressed(Keys.L))
+			{
+				this.client.SendMessage(
+					Net.Message.Create(Net.Message.MessageType.Login)
+						.SetField("username", "foo")
+						.Secure());
+			}
+
 			this.client.Receive();
 
 			foreach (var player in this.model.Players)
@@ -128,6 +140,21 @@ namespace Illuminated.Client
 						$"{position.X}, {position.Y}",
 						player.Position.Round(),
 						Color.White);
+			}
+
+			var first = System.Math.Max(0, this.client.History.Count - 5);
+			var last = System.Math.Min(this.client.History.Count - first, 5);
+			var history = this.client.History.GetRange(first, last);
+
+			for (var i = 0; i < last - first; i++)
+			{
+				this.spriteBatch.DrawString(
+					this.debugFont,
+					history[i].ToString(),
+					new Vector2(
+						0,
+						this.graphics.PreferredBackBufferHeight - 20 * (i + 1)),
+					Color.White);
 			}
 
 			spriteBatch.End();

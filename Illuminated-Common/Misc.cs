@@ -20,6 +20,9 @@ namespace Illuminated
 
 		public static List<T> Exclude<T>(this List<T> l, T except) =>
 			l.Except(new [] { except }).ToList();
+
+		public static IEnumerable<T> Exclude<T>(this IEnumerable<T> l, T except) =>
+			l.Except(new [] { except });
 	}
 
 	public class TypeSwitch

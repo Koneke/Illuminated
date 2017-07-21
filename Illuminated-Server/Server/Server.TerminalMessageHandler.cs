@@ -6,10 +6,11 @@ namespace Illuminated.Net
 {
 	public partial class Server
 	{
-		private class TerminalMessageHandler
+		private class TerminalMessageHandler : MessageHandler.ISubHandler
 		{
-			public MessageQueue MessageQueue =
-				new MessageQueue();
+			public string Key => "terminal";
+			public MessageHandler.HandlerDelegate Handler => this.Handle;
+			public MessageQueue MessageQueue { get; private set; } = new MessageQueue();
 
 			private Server server;
 
@@ -18,7 +19,7 @@ namespace Illuminated.Net
 				this.server = server;
 			}
 
-			public void HandleTerminal(NetIncomingMessage incoming)
+			public void Handle(NetIncomingMessage incoming)
 			{
 				var command = incoming.ReadString();
 				var argumentCount = incoming.ReadInt32();

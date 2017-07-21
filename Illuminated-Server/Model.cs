@@ -1,13 +1,18 @@
-﻿
+﻿using System.Collections.Generic;
+
 using Lidgren.Network;
+
 using Microsoft.Xna.Framework;
 
 namespace Illuminated.Net
 {
 	public class Model
 	{
-		public ClientCollection Clients =
-			new ClientCollection();
+		public ClientCollection<IIllClient> Clients =
+			new ClientCollection<IIllClient>();
+
+		public Dictionary<IIllClient, Player> ClientPlayer =
+			new Dictionary<IIllClient, Player>();
 
 		public MessageQueue MessageQueue =
 			new MessageQueue();
@@ -29,19 +34,23 @@ namespace Illuminated.Net
 					client.Recipient,
 					Message.Create(Message.MessageType.OtherSpawn)
 						.SetField("player-id", existing.ID)
-						.SetField("x", existing.Player.Position.X)
-						.SetField("y", existing.Player.Position.Y));
+						.SetField("x", this.ClientPlayer[existing].Position.X)
+						.SetField("y", this.ClientPlayer[existing].Position.Y));
 			}
 		}
 
 		public Client Spawn(NetConnection connection)
 		{
+			var player = new Player {
+				Position = new Vector2(100.0f, 100.0f)
+			};
+
 			var client = new Client(
 				this.server,
 				connection,
-				new Player {
-					Position = new Vector2(100.0f, 100.0f)
-				} );
+				player );
+		
+			this.ClientPlayer.Add(client, player);
 
 			this.Clients.AddClient(client.Connection, client);
 

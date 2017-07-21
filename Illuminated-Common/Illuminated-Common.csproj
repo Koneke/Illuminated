@@ -47,13 +47,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Async.cs" />
+    <Compile Include="ClientCollection.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Net\MessageQueue.cs" />
+    <Compile Include="Net\MessageRecipient.cs" />
     <Compile Include="Net\Message\Message.Create.cs" />
     <Compile Include="Net\Message\Message.cs" />
     <Compile Include="Net\Message\Message.Types.cs" />
     <Compile Include="Net\Messenger.cs" />
     <Compile Include="Net\NetValue.cs" />
+    <Compile Include="Net\SafeConversation.cs" />
+    <Compile Include="Net\MessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

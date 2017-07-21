@@ -75,7 +75,6 @@
     <Compile Include="Server\Server.ConnectionMessageHandler.cs" />
     <Compile Include="Server\Server.cs" />
     <Compile Include="Server\Server.DataMessageHandler.cs" />
-    <Compile Include="Server\Server.MessageHandler.cs" />
     <Compile Include="Server\Server.SecurityMessageHandler.cs" />
     <Compile Include="Server\Server.TerminalMessageHandler.cs" />
   </ItemGroup>

@@ -4,7 +4,13 @@ using Lidgren.Network;
 
 namespace Illuminated.Net
 {
-	/*public class ClientCollection
+	public interface IIllClient
+	{
+		int ID { get; }
+		NetConnection Connection { get; set; }
+	}
+
+	public class ClientCollection<Client> where Client : IIllClient
 	{
 		public Client this[NetConnection c] => this.ByConnection[c];
 		public Client this[int i] => this.ByID[i];
@@ -20,8 +26,10 @@ namespace Illuminated.Net
 			this.ByID = new Dictionary<int, Client>();
 		}
 
-		public ClientCollection AddClient(NetConnection connection, Client client)
-		{
+		public ClientCollection<Client> AddClient(
+			NetConnection connection,
+			Client client
+		) {
 			this.All.Add(client);
 			this.ByConnection.Add(connection, client);
 			this.ByID.Add(client.ID, client);
@@ -29,7 +37,7 @@ namespace Illuminated.Net
 			return this;
 		}
 
-		public ClientCollection RemoveClient(Client client)
+		public ClientCollection<Client> RemoveClient(Client client)
 		{
 			this.All.Remove(client);
 			this.ByConnection.Remove(client.Connection);
@@ -37,5 +45,5 @@ namespace Illuminated.Net
 
 			return this;
 		}
-	}*/
+	}
 }

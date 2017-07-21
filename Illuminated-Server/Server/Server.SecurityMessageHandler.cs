@@ -7,16 +7,17 @@ namespace Illuminated.Net
 {
 	public partial class Server
 	{
-		private class SecurityMessageHandler
+		private class SecurityMessageHandler : MessageHandler.ISubHandler
 		{
-			public MessageQueue MessageQueue =
-				new MessageQueue();
+			public string Key => "security";
+			public MessageHandler.HandlerDelegate Handler => this.Handle;
+			public MessageQueue MessageQueue { get; private set; } = new MessageQueue();
 
-			private ClientCollection clients;
+			private ClientCollection<IIllClient> clients;
 
 			private const int saltSize = 32;
 
-			public SecurityMessageHandler(ClientCollection clients)
+			public SecurityMessageHandler(ClientCollection<IIllClient> clients)
 			{
 				this.clients = clients;
 			}
@@ -33,14 +34,15 @@ namespace Illuminated.Net
 				return salt;
 			}
 
-			public void HandleSecurity(MessageHandler.ReceivedMessage received)
+			public void Handle(NetIncomingMessage incoming)
 			{
-				var mt = received.IncomingMessage.ReadString();
+				var mt = MessageHandler.ReadType(incoming);
+				var received = MessageHandler.ReceivedMessage.Receive(mt, incoming);
 
 				//NetIncomingMessage incoming = null;
 				//var rec = MessageHandler.ReceivedMessage.Receive(, incoming);
 
-				var client = this.clients[received.Connection];
+				var client = this.clients[received.Connection] as Client;
 				var message = received.Message;
 
 				switch (received.MessageType)

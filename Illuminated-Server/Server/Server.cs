@@ -18,7 +18,6 @@ namespace Illuminated.Net
 		private NetServer netServer;
 
 		private Messenger messenger;
-		private MessageHandler messageHandler;
 
 		private Model model;
 
@@ -63,24 +62,12 @@ namespace Illuminated.Net
 
 			this.model = new Model(this);
 
-			var dmh = new DataMessageHandler(this.model);
-			var cmh = new ConnectionMessageHandler(this.model);
-			var tmh = new TerminalMessageHandler(this);
-			var smh = new SecurityMessageHandler(this.model.Clients);
-
-			this.messageHandler = new MessageHandler(
-				this.model.Clients,
-				dmh.HandleData,
-				cmh.HandleConnection,
-				tmh.HandleTerminal,
-				smh.HandleSecurity);
-
-			this.messenger = new Messenger(this.netServer)
+			this.messenger = new Messenger(this.netServer, this.model.Clients)
 				.Poll(this.model.MessageQueue)
-				.Poll(dmh.MessageQueue)
-				.Poll(cmh.MessageQueue)
-				.Poll(tmh.MessageQueue)
-				.Poll(smh.MessageQueue);
+				.AddMessageHandler(new DataMessageHandler(this.model))
+				.AddMessageHandler(new ConnectionMessageHandler(this.model))
+				.AddMessageHandler(new TerminalMessageHandler(this))
+				.AddMessageHandler(new SecurityMessageHandler(this.model.Clients));
 
 			this.Run();
 		}
@@ -109,7 +96,7 @@ namespace Illuminated.Net
 
 			while ((incoming = netServer.ReadMessage()) != null)
 			{
-				this.messageHandler.Handle(incoming);
+				this.messenger.MessageHandler.Handle(incoming);
 			}
 
 			this.messenger.Flush();

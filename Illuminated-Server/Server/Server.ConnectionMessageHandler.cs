@@ -7,19 +7,20 @@ namespace Illuminated.Net
 {
 	public partial class Server
 	{
-		private class ConnectionMessageHandler
+		private class ConnectionMessageHandler : MessageHandler.ISubHandler
 		{
-			public MessageQueue MessageQueue = new MessageQueue();
+			public string Key => "connection";
+			public MessageHandler.HandlerDelegate Handler => this.Handle;
+			public MessageQueue MessageQueue { get; private set; } = new MessageQueue();
 
 			private Model model;
-			private ClientCollection clients => model.Clients;
 
 			public ConnectionMessageHandler(Model model)
 			{
 				this.model = model;
 			}
 
-			public void HandleConnection(NetIncomingMessage incoming)
+			public void Handle(NetIncomingMessage incoming)
 			{
 				Client client;
 
@@ -34,7 +35,7 @@ namespace Illuminated.Net
 						{
 							this.MessageQueue.SendExcept(
 								client.Recipient,
-								this.clients.All.Select(c => c.Recipient),
+								this.model.Clients.All.Select(c => (c as Client).Recipient),
 								Message.Create(Message.MessageType.OtherSpawn)
 									.SetField("player-id", client.ID)
 									.SetField("x", client.Player.Position.X)
@@ -46,15 +47,15 @@ namespace Illuminated.Net
 					case NetConnectionStatus.Disconnected:
 						Console.WriteLine("Client left.");
 
-						client = this.clients[incoming.SenderConnection];
+						client = this.model.Clients[incoming.SenderConnection] as Client;
 
 						this.MessageQueue.SendExcept(
 							client.Recipient,
-							this.clients.All.Select(c => c.Recipient),
+							this.model.Clients.All.Select(c => (c as Client).Recipient),
 							Message.Create(Message.MessageType.OtherDisconnected)
 								.SetField("player-id", client.ID));
 
-						this.clients.RemoveClient(client);
+						this.model.Clients.RemoveClient(client);
 
 						break;
 				}
